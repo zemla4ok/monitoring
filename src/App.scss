@@ -1,0 +1,19 @@
+.App {
+  padding: 25px;
+
+  .directions {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin-bottom: 25px;
+
+    .direction {
+      width: calc(50% - 18px);
+    }
+  }
+
+  .btn {
+    margin-top: 25px;
+  }
+}
