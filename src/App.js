@@ -16,12 +16,16 @@ const locations = [
   {label: 'Pinsk', id: 1},
 ]
 
+let interval;
+
 function App() {
   const [from, setFrom] = useState(locations[0].id);
   const [to, setTo] = useState(locations[1].id);
 
   const [fromDate, setFromDate] = useState(moment());
   const [tillDate, setTillDate] = useState(moment().add(1, 'hour'));
+
+  const [logs, setLogs] = useState([]);
 
   useEffect(() => {
     if (!("Notification" in window)) {
@@ -47,10 +51,18 @@ function App() {
         direction_id: to
       }
     }).then(res => res.data).then(items => {
-      // const count = parseInt(item.count);
-      // const date = moment(item.departure_time).format()
+      const filterdByTime = items.filter(item => moment(item.departure_time).isBetween(fromDate, tillDate));
+      setLogs(prev => ([...prev, filterdByTime.map(item => ({
+        check: moment(),
+        time: item.departure_time,
+        count: parseInt(item.count)
+      }))]));
 
-      console.log(items);
+      filterdByTime.forEach(item => {
+        if (parseInt(item.count) >= 1) {
+          showNotification(`We are find a place for you at ${moment(item.departure_time).format('HH:mm')}🥰`);
+        }
+      })
     })
   }
 
@@ -61,7 +73,11 @@ function App() {
       return;
     } else {
       showNotification('You are subscribed.');
-      subscription();
+
+      clearInterval(interval);
+      interval = setInterval(() => {
+        subscription();
+      }, 60 * 1000);
     }
   }
 
@@ -109,7 +125,7 @@ function App() {
                 label: position === 'start' ? 'From' : 'Till',
               }),
             }}
-            format='DD.MM.YYYY h:mm:ss a'
+            format='DD.MM.YYYY HH:mm:ss'
             value={[fromDate, tillDate]}
             onChange={([from, till]) => {
               setFromDate(from);
@@ -120,6 +136,18 @@ function App() {
       </LocalizationProvider>
 
       <Button className='btn' variant="outlined" fullWidth onClick={onClickHandler}>Subscribe</Button>
+
+      <Typography variant='h4'>Logs</Typography>
+      <div className='logs-list'>
+        {
+          logs.map(log => {
+            return (<div className='log-item'>
+              <div>{log[0].check.format('DD.MM.YYYY HH:mm:ss')} --</div>
+              {log.map(item => <div>{moment(item.time).format('HH:mm')} - {item.count} |</div>)}
+            </div>)
+          })
+        }
+      </div>
     </div>
   );
 }

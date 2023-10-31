@@ -15,5 +15,26 @@
 
   .btn {
     margin-top: 25px;
+    margin-bottom: 50px;
+  }
+
+  .logs-list {
+    display: flex;
+    flex-direction: column;
+
+    .log-item {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 15px;
+      margin-top: 15px;
+
+      div {
+        margin-right: 25px;
+
+        &:first-child {
+          font-weight: bold;
+        }
+      }
+    }
   }
 }
